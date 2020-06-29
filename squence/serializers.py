@@ -10,6 +10,7 @@ class EmployeeSerializer(serializers.Serializer):
 
     username = serializers.CharField()
     password = serializers.CharField()
+    phone = serializers.CharField()
     # gender = serializers.IntegerField()   # 信息默认为 choices=gender_choices,
     # pic = serializers.ImageField()        # 信息默认为 当前路径 /media/pic/xxx.jpg
 
@@ -30,3 +31,25 @@ class EmployeeSerializer(serializers.Serializer):
 
 
 
+# 创建反（De）序列化器
+class EmployeeDeSerializer(serializers.Serializer):
+
+    # 前端信息反序列化校验规则
+    # 用户名长度规划
+    username = serializers.CharField(
+        max_length=8,
+        min_length=2,
+        # 为前端提供返回的错误信息 serializer.errors
+        error_messages={
+            "max_length": "长度过长！",
+            "min_length": "长度过短！",
+        }
+    )
+    password = serializers.CharField(required=False)
+    phone = serializers.CharField()
+
+    # 新增信息  须重写create()方法
+    # 原因：继承自serializer类，没有新增的具体操作实现
+    def create(self, validated_data):
+        # 新增方法 create(**validated_data)
+        return Employee.objects.create(**validated_data)
